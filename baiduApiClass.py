@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
+# 百度api返回的数据是mp3格式，需要加载额外的程序才可处理
 import configparser
 from baidu_API.aip import AipSpeech
 
@@ -17,10 +18,6 @@ class BaiduApi(object):
         return self.__client.synthesis(text, 'zh', 1, {
             'per': per,
         })
-        # 识别正确返回语音二进制 错误则返回dict 参照下面错误码
-        # if not isinstance(result, dict):
-        #     with open('auido1.mp3', 'wb') as f:
-        #         f.write(result)
 
     # 设置api信息
     def __setApiInfo(self):
@@ -31,7 +28,7 @@ class BaiduApi(object):
             msg = '没有配置文件'
         else:
             # 以下信息需要百度智能云生成应用时获得
-            if 'Baidu_API' in config and 'SECRET_KEY' in config['Baidu_API']:
+            if 'Baidu_API' in config:
                 if ('APP_ID' in config['Baidu_API']):
                     self.__appId = config['Baidu_API']['APP_ID'].strip()
                     if (self.__appId == ''):
@@ -50,17 +47,17 @@ class BaiduApi(object):
                 else:
                     msg = 'API_KEY字段不存在'
 
-                if ('API_KEY' in config['Baidu_API']):
+                if ('SECRET_KEY' in config['Baidu_API']):
                     self.__secretKey = config['Baidu_API']['SECRET_KEY'].strip()
                     if (self.__secretKey == ''):
-                        msg = 'API_KEY字段是空的'
+                        msg = 'SECRET_KEY字段是空的'
                     else:
                         msg = 0
                 else:
-                    msg = 'API_KEY字段不存在'
+                    msg = 'SECRET_KEY字段不存在'
             else:
-                msg = '百度api的用户信息有问题'
+                msg = '请按照要求配置好env.ini文件'
         return msg
 
     def __del__(self):
-        print('合成类使命完成')
+        print('百度语音合成类使命完成')
