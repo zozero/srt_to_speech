@@ -3,12 +3,5 @@ auido.mp3
 env.ini
 venv
 __pycache__
-test.mp3
-test.wav
-test - 副本.srt
-test388.wav
-tmp1.wav
-tmp2.wav
-test.srt
-tmp3.wav
-临时播放时间.txt
+sound/*
+srt/*

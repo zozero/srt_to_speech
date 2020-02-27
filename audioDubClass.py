@@ -40,5 +40,5 @@ class AudioDub(object):
         # crossfade 用于过渡的时间
         return frontSound.append(behindSound, crossfade=100)
     # 导出音频
-    def exportAudio(self,sound,name='test.wav'):
+    def exportAudio(self,sound,name='./sound/test.wav'):
         sound.export(name, format="wav")

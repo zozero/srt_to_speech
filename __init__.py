@@ -51,7 +51,7 @@ def init():
         time = srt.strArr[i + 1].start - srt.strArr[i].end
         print('分段时间：' + str(time))
         # 命名
-        name = 'tmp' + str(count) + '.wav'
+        name = './sound/tmp' + str(count) + '.wav'
         count = count + 1
         # 限制生成文件的数量
         if count > 3:
@@ -69,7 +69,8 @@ def init():
 
 
 if __name__ == '__main__':
-    # sound=AudioSegment.from_wav('tmp3.wav')
-    # print(len(sound))
+    sound=AudioSegment.from_wav('tmp3.wav')
+    sound.export('./sound/test.wav',format='wav')
+    print(len(sound))
     # 开始行动
-    init()
+    # init()
