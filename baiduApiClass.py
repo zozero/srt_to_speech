@@ -13,10 +13,11 @@ class BaiduApi(object):
         self.__client = AipSpeech(self.__appId, self.__apiKey, self.__secretKey)
 
     # text 需要合成的文本
-    # per 发音人选择, 0为女声，1为男声，3为情感合成-度逍遥，4为情感合成-度丫丫，默认为普通女
+    # per 发音人选择, 0为女声，1为男声，3为情感合成-度逍遥，4为情感合成-度丫丫，默认为普通女 度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5
     def synthesis(self, text, per=0):
         return self.__client.synthesis(text, 'zh', 1, {
             'per': per,
+            'aue': 6,
         })
 
     # 设置api信息

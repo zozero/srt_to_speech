@@ -9,17 +9,73 @@ from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentClo
 from tencentcloud.tts.v20190823 import tts_client, models
 import uuid
 import base64
-import json
-
+from pydub import AudioSegment
+import time
+# 封装腾讯语音合成接口类
 class TencentApi(object):
-    def __init__(self,text,voiceType='0'):
+    def __init__(self):
         msg = self.__setApiInfo()
         if (msg != 0):
             print(msg)
-        self.__synthesis(text,voiceType)
+
+    # 设置并返回正确时间的音频流 这会导致重复请求多次
+    # keepTime 音频持续时间
+    def getStream(self, text, keepTime, voiceType='0'):
+        # 上一个的长度
+        beforeLen = 0
+        # 上一个的流
+        beforeStream = 0
+        # 最慢
+        left = -20
+        # 最快
+        right = 20
+        # 音频流
+        stream=0
+        # 二分搜索 找到最靠近srt文件所指的长度，且小于srt文件所指的长度 这可能会导致一句话被多次请求 预计最多6次能够找到
+        while left < right:
+            # 设置中间值
+            middle = int((left + right) / 2)
+            # 获取音频流
+            stream = self.synthesis(text, voiceType, str(middle / 10))
+            # 当前流的长度
+            curLen = self.audioLen(stream)
+            # 当前流对应所需时间,直接返回
+            if curLen == keepTime:
+                return stream
+            # 找到最小值
+            elif (right - left == 1 and curLen > keepTime):
+                return beforeStream
+            elif curLen < keepTime:
+                beforeLen = curLen
+                beforeStream = stream
+                right = middle - 1
+            elif curLen > keepTime:
+                beforeLen = curLen
+                beforeStream = stream
+                left = middle + 1
+            time.sleep(0.2)
+        # 这表明最快速度也大于srt的时间
+        return stream
+
+    # 返回音频的长度
+    # stream 音频流
+    def audioLen(self, stream):
+        sound = AudioSegment(
+            # raw audio data (bytes) 二进制数据流
+            data=stream,
+            #  采样位数 2 byte (16 bit) samples 通常有8bit、16bit、24bit和32bit等几种
+            sample_width=2,
+
+            # 44.1 kHz frame rate 采样率
+            frame_rate=16000,
+
+            # 声道 stereo 1 单声道
+            channels=1
+        )
+        return len(sound)
 
     # 腾讯tts请求的参数设置
-    # Text 需要转换成语音的文本
+    # Text 需要转换成语音的文本 中文最大支持100个汉字（全角标点符号算一个汉字）
     # VoiceType 声音的类型 包括
     # 0-云小宁，亲和女声(默认)
     # 1-云小奇，亲和男声
@@ -33,7 +89,8 @@ class TencentApi(object):
     # 1003-智美，客服女声（新）
     # 1050-WeJack，英文男声（新）
     # 1051-WeRose，英文女声（新）
-    def __synthesis(self, text, voiceType='0'):
+    # speend    用于控制播放速度
+    def synthesis(self, text, voiceType='0', speed='0'):
         try:
             # 获取腾讯云凭证
             cred = credential.Credential(self.__secretId, self.__secretKey)
@@ -50,26 +107,18 @@ class TencentApi(object):
             client = tts_client.TtsClient(cred, "ap-guangzhou", clientProfile)
             # 腾讯tts请求参数结构体
             req = models.TextToVoiceRequest()
-            params = '{"Text":"'+text+'","VoiceType":"'+voiceType+'","SessionId":"'+str(uuid.uuid4())+'","ModelType":"1"}'
-            print(params)
+            params = '{"Text":"' + text + '","VoiceType":"' + voiceType + '","SessionId":"' + str(
+                uuid.uuid4()) + '","ModelType":1,"Speed":' + speed + ',"SampleRate":16000,"Codec":"wav","Volume":0}'
             req.from_json_string(params)
-            # 生成语音
+            # 生成base64语音
             resp = client.TextToVoice(req)
-            # 将返回的数据转换成dict（字典类型）
-            audioBase64=json.loads(resp.to_json_string())
             # 将base64的字符转换成二进制流
-            stream = base64.b64decode(audioBase64["Audio"])
-            print(text)
-            # 打开文件
-            wavfile = open("test.wav", "wb")
-            # 写入文件
-            wavfile.write(stream)
-            # 关闭文件
-            wavfile.close()
+            return base64.b64decode(resp.Audio)
         except TencentCloudSDKException as err:
             print(err)
 
         # env.ini信息
+
     def __setApiInfo(self):
         msg = 0
         # 读取配置文件
