@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from pydub import AudioSegment
+import time
 # 封装音频处理类
 class AudioDub(object):
     def __init__(self):
@@ -40,5 +41,6 @@ class AudioDub(object):
         # crossfade 用于过渡的时间
         return frontSound.append(behindSound, crossfade=100)
     # 导出音频
-    def exportAudio(self,sound,name='./sound/test.wav'):
-        sound.export(name, format="wav")
+    def exportAudio(self,sound,name='test.wav'):
+        formtTime=time.strftime("%Y-%m-%d", time.localtime())
+        sound.export('./sound/'+formtTime+'_'+name, format="wav")

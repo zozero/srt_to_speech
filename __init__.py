@@ -5,9 +5,9 @@ from tencentApiClass import TencentApi
 # from baiduApiClass import BaiduApi
 from srtClass import SrtClass
 from audioDubClass import AudioDub
-
+import time
 from pydub import AudioSegment
-
+from pydub import effects
 def init():
     # 启动合成类
     synt = TencentApi()
@@ -43,6 +43,7 @@ def init():
         time = time - len(tmpSound)
         # 可能出现最快速度也大于srt的时间，那么直接裁剪
         if (time < 0):
+            # 裁剪将会少字，建议将十分长的话在srt文件中缩短
             sound = sound[:time]
         else:
             # 添加空白
@@ -69,8 +70,5 @@ def init():
 
 
 if __name__ == '__main__':
-    sound=AudioSegment.from_wav('tmp3.wav')
-    sound.export('./sound/test.wav',format='wav')
-    print(len(sound))
     # 开始行动
-    # init()
+    init()
