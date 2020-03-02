@@ -3,5 +3,5 @@ auido.mp3
 env.ini
 venv
 __pycache__
-sound/*
-srt/*
+sound/
+srt/

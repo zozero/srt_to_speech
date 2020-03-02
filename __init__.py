@@ -2,12 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 from tencentApiClass import TencentApi
+# 百度的尚未完成
 # from baiduApiClass import BaiduApi
 from srtClass import SrtClass
 from audioDubClass import AudioDub
-import time
-from pydub import AudioSegment
-from pydub import effects
 def init():
     # 启动合成类
     synt = TencentApi()
@@ -17,7 +15,7 @@ def init():
     sound = dub.getEmpty()
 
     # 处理srt文件
-    srt = SrtClass("test.srt")
+    srt = SrtClass("./srt/test.srt")
     # 获得第一段前的空白时间
     time = srt.strArr[0].start - 0
     # 拿出最后一个，它们需要特殊处理
@@ -35,24 +33,33 @@ def init():
         stream = synt.getStream(text=srt.strArr[i].text, keepTime=time)
         # 用于计算差值，添加空白
         tmpSound = dub.getSound(stream)
+        # 查看两者时间值
+        tmpTime = time - len(tmpSound)
+        print(tmpTime)
+        if(tmpTime < -300):
+            # 裁剪将会少字，建议将十分长的话在srt文件中缩短
+            # 重新修剪
+            tmpSound = dub.speedSound(tmpSound, time)
         # 合并音频，因为之前的声音都是空白所有可以直接加
         sound = dub.mergeSound(sound, tmpSound)
+
         print('srt文件时间：' + str(time))
         print('音频时间：' + str(len(tmpSound)))
         print('留白时间：' + str(time - len(tmpSound)))
-        time = time - len(tmpSound)
+
+        # 再次查看两者时间值
+        tmpTime = time - len(tmpSound)
         # 可能出现最快速度也大于srt的时间，那么直接裁剪
-        if (time < 0):
-            # 裁剪将会少字，建议将十分长的话在srt文件中缩短
-            sound = sound[:time]
+        if (tmpTime < 0):
+            sound = sound[:tmpTime]
         else:
             # 添加空白
-            sound += dub.addLacuna(time)
+            sound += dub.addLacuna(tmpTime)
         # 设置第一段与第二段之间的空白
         time = srt.strArr[i + 1].start - srt.strArr[i].end
         print('分段时间：' + str(time))
         # 命名
-        name = './sound/tmp' + str(count) + '.wav'
+        name = str(count) + '.wav'
         count = count + 1
         # 限制生成文件的数量
         if count > 3:
@@ -67,7 +74,6 @@ def init():
     print('声音导出完毕!')
     # 导出音频
     dub.exportAudio(sound)
-
 
 if __name__ == '__main__':
     # 开始行动

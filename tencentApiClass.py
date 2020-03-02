@@ -43,7 +43,7 @@ class TencentApi(object):
             if curLen == keepTime:
                 return stream
             # 找到最小值
-            elif (right - left == 1 and curLen > keepTime):
+            elif right - left == 1 and curLen < keepTime and curLen < beforeLen:
                 return beforeStream
             elif curLen < keepTime:
                 beforeLen = curLen
