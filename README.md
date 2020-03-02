@@ -5,7 +5,7 @@
     主要用于翻译声音
     需要srt字幕文件
     
-## 模块要求
+## 需要前用pip安装的模块
    - [pydub](http://pydub.com/)：音频处理
    - [tencentcloud-sdk-python](https://github.com/TencentCloud/tencentcloud-sdk-python)：腾讯api，百度的接口部分还没完成
    - [pysubs2](https://github.com/tkarabela/pysubs2)：srt字幕文件处理
@@ -14,5 +14,5 @@
     1、复制env.ini.example文件，改名为env.ini，并填充Tencent_API的接口所需数据
     2、修改字幕文件地址
         srt = SrtClass("./srt/test.srt")
-    3、创建文件根目录下创建 “sound” 文件夹
+    3、根目录下创建 “sound” 文件夹（音频保存在内部），音频类型为256kbps的wav文件
     
