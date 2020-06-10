@@ -53,7 +53,7 @@ class TencentApi(object):
                 beforeLen = curLen
                 beforeStream = stream
                 left = middle + 1
-            time.sleep(0.2)
+            time.sleep(0.5)
         # 这表明最快速度也大于srt的时间
         return stream
 

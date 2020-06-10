@@ -15,7 +15,7 @@ def init():
     sound = dub.getEmpty()
 
     # 处理srt文件
-    srt = SrtClass("./srt/test.srt")
+    srt = SrtClass("./srt/What Is Sociology.srt")
     # 获得第一段前的空白时间
     time = srt.strArr[0].start - 0
     # 拿出最后一个，它们需要特殊处理

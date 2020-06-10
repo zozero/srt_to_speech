@@ -57,8 +57,10 @@ class AudioDub(object):
         left = 100
         right = 130
         beforeSound = 0
-        curSound=0
+        curSound = 0
+        toalCount = 0
         while left < right:
+            toalCount = toalCount + 1
             middle = int((left + right) / 2)
             # 参数： 音频 倍数 块大小 过渡时间
             curSound = effects.speedup(sound, middle / 100, 300, 100)
@@ -70,9 +72,11 @@ class AudioDub(object):
             elif soundLen < keepTime:
                 right = middle + 1
                 beforeSound = curSound
-                beforeLen=soundLen
+                beforeLen = soundLen
             elif soundLen > keepTime:
                 left = middle + 1
                 beforeSound = curSound
-                beforeLen=soundLen
+                beforeLen = soundLen
+            if toalCount == 30:
+                break
         return curSound
